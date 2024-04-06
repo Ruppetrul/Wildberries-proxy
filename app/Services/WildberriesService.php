@@ -41,7 +41,7 @@ class WildberriesService
 
             $response = curl_exec($ch);
 
-            $response = json_decode($response);
+            $response = json_decode($response, 1);
 
             curl_close($ch);
         } catch (\Exception $e) {
