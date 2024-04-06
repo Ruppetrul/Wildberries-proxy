@@ -14,15 +14,15 @@ class ApiController extends Controller
     public function search($text)
     {
         try {
-            $search = Search::where('text', $text)->with('products')->first();
+            $search = Search::where('text', urldecode($text))->with('products')->first();
 
-            if ($search) {
+            if (!$search) {
                 throw new Exception('Searching with this value is not supported. '
-                    . 'Try with a different value or configure the system for this query.');
+                    . 'Try with a different value or configure the system for this query.', 404);
             }
 
             if ($search->products->isEmpty()) {
-                throw new Exception('No products found for this search.');
+                throw new Exception('No products found for this search.', 404);
             }
 
             $products = $search->products->map(function ($product) {
