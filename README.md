@@ -11,8 +11,8 @@ It gives the possibility of gradual data processing.
 or just open it up in your browser (for test) ``` http://localhost:8000/api/updateData ```.
 You can either configure Cron to run this command or run it manually.
 
-2. Perform GET request with your parameter http://localhost:8000/api/search/{your-search}.
-   Available:
+2. Perform GET request with your search parameter http://localhost:8000/api/search/{your-search}.
+   Available search parameters:
    - 'футболка оверсайз'
    - 'футболка мужская'
    - 'футболка мужская оверсайз' 
