@@ -36,26 +36,43 @@ class UpdateSearchData extends Command
      */
     public function handle()
     {
-        $result = true;
+        $response = [];
 
         try {
+            $searchs = Search::all();
+
+            foreach ($searchs as $search) {
+                $response[$search->text] = 'Error';
+            }
+
             Product::removeALl();
 
-            foreach (Search::all() as $search) {
-                $result = $this->wildberriesService->search($search->text);
+            foreach ($searchs as $search) {
+                /*Wilberries API is not stable, so need to make sure that the response is correct.
+                When the response is not correct, the 'params' key is present.*/
+                $i = 0;
+                while ($i < 10) {
+                    $result = $this->wildberriesService->search($search->text);
+                    if (is_array($result) && !isset($result['params']) && !empty($result['data']['products'])) {
+                        $response[$search->text] = 'Success';
+                        break;
+                    }
+                    sleep(1);
+                    $i++;
+                }
 
-                if (!is_array($result) || empty($result['data']['products'])) {
-                    //TODO Иногда тут может быть только 1 левая запись вместо вменяемого ответа.
+                if ($response[$search->text] != 'Success') {
                     continue;
                 }
                 $this->handleData($result['data']['products'], $search->id);
             }
         } catch (\Exception $exception) {
-            $result = false;
             Log::error($exception->getMessage());
         }
 
-        echo ($result ? 'Success' : 'Error') . PHP_EOL;
+        foreach ($response as $key => $value) {
+            echo "For search `$key` result `$value`" . PHP_EOL;
+        }
     }
 
     /**
